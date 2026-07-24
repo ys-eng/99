@@ -3,10 +3,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get('/time-elapsed', (req, res) => {
-    // התאריך המבוקש (שנה, חודש (0-11), יום, שעה, דקה)
-    // שימו לב: בחודשים ב-JavaScript ינואר הוא 0 ודצמבר הוא 11
-    const targetDate = new Date(2023, 0, 15, 10, 0, 0); 
-    const now = new Date();
+// יצירת אובייקט תאריך (חודש 6 = יולי)
+const targetDate = new Date(70, 6, 5, 11, 44, 0);
+// הגדרה מפורשת של שנת 70 לספירה (ולא 1970)
+targetDate.setFullYear(70);
+const now = new Date();
 
     let years = now.getFullYear() - targetDate.getFullYear();
     let months = now.getMonth() - targetDate.getMonth();
