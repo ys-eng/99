@@ -1,5 +1,4 @@
 const express = require('express');
-const { HDate } = require('@hebcal/core');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,50 +13,40 @@ app.get('/time-elapsed-hebrew', (req, res) => {
     try {
         const now = new Date();
         
-        // הגדרת תאריך היעד העברי
-        const targetHDate = new HDate(17, 'Tamuz', 3830); 
-        const currentHDate = new HDate(now);
+        // הגדרת תאריך היעד (שנה, חודש 0-11, יום)
+        const targetDate = new Date(70, 7, 30, 11, 44, 0); 
 
-        let years = currentHDate.getFullYear() - targetHDate.getFullYear();
-        let months = currentHDate.getMonth() - targetHDate.getMonth();
-        let days = currentHDate.getDate() - targetHDate.getDate();
+        let years = now.getFullYear() - targetDate.getFullYear();
+        let months = now.getMonth() - targetDate.getMonth();
+        let days = now.getDate() - targetDate.getDate();
 
-        // תיקון ימים במידת הצורך לפי מספר הימים בחודש העברי
         if (days < 0) {
             months--;
-            const prevMonthHDate = new HDate(1, currentHDate.getMonthName(), currentHDate.getFullYear()).prev();
-            days += prevMonthHDate.daysInMonth();
+            const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+            days += prevMonth.getDate();
         }
 
-        // תיקון חודשים עבריים במידת הצורך (מתחשב בשנה מעוברת)
         if (months < 0) {
             years--;
-            const prevYear = currentHDate.getFullYear() - 1;
-            const monthsInPrevYear = new HDate(1, 'Tishrei', prevYear).isLeapYear() ? 13 : 12;
-            months += monthsInPrevYear;
+            months += 12;
         }
 
-        // חישוב שעות, דקות ושניות
-        const targetHours = 11;
-        const targetMinutes = 44;
-        const targetSeconds = 0;
-
-        let hours = now.getHours() - targetHours;
-        let minutes = now.getMinutes() - targetMinutes;
-        let seconds = now.getSeconds() - targetSeconds;
+        let hours = now.getHours() - targetDate.getHours();
+        let minutes = now.getMinutes() - targetDate.getMinutes();
+        let seconds = now.getSeconds() - targetDate.getSeconds();
 
         if (seconds < 0) { minutes--; seconds += 60; }
         if (minutes < 0) { hours--; minutes += 60; }
         if (hours < 0) { hours += 24; }
 
-        // בניית מחרוזת בעברית באמצעות s- (TTS)
-        const responseText = `id_list_message=n-${years}.s-שנים.n-${months}.s-חודשים.n-${days}.s-ימים.n-${hours}.s-שעות.n-${minutes}.s-דקות.n-${seconds}.s-שניות`;
+        // שימוש בתגי הודעות מערכת מובנות של ימות המשיח (t-...)
+        const responseText = `id_list_message=n-${years}.t-years.n-${months}.t-months.n-${days}.t-days.n-${hours}.t-hours.n-${minutes}.t-minutes.n-${seconds}.t-seconds`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
     } catch (error) {
         console.error('Error handling request:', error);
-        res.status(500).send('id_list_message=s-שגיאה בחישוב התאריך');
+        res.status(500).send('id_list_message=t-Error');
     }
 });
 
