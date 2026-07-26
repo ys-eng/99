@@ -4,6 +4,12 @@ const { HDate } = require('@hebcal/core');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// נתיב ראשי לבדיקת תקינות השרת (Health Check) עבור UptimeRobot
+app.get('/', (req, res) => {
+    res.status(200).send('OK');
+});
+
+// הנתיב המיועד לימות המשיח
 app.get('/time-elapsed-hebrew', (req, res) => {
     try {
         const now = new Date();
@@ -18,7 +24,7 @@ app.get('/time-elapsed-hebrew', (req, res) => {
 
         if (days < 0) {
             months--;
-            // שימוש ב-prev() במקום sub()
+            // קבלת היום הקודם בעזרת .prev()
             const prevMonthHDate = new HDate(1, currentHDate.getMonthName(), currentHDate.getFullYear()).prev();
             days += prevMonthHDate.daysInMonth();
         }
