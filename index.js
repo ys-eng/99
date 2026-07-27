@@ -9,15 +9,14 @@ app.get('/', (req, res) => {
 
 app.get('/time-elapsed-hebrew', (req, res) => {
     try {
-        // קבלת הזמן הנוכחי לפי שעון ישראל
         const nowString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
         const now = new Date(nowString);
         
-        // הגדרת תאריך היעד: 5 באוגוסט שנת 70, בשעה 11:44:00 לפי שעון ישראל
+        // הגדרת תאריך היעד: 5 באוגוסט שנת 70, שעה 11:44 לפי שעון ישראל
         const targetDate = new Date();
         targetDate.setFullYear(70);
-        targetDate.setMonth(7); // אוגוסט (0 = ינואר, 7 = אוגוסט)
-        targetDate.setDate(5);  // ה-5 בחודש
+        targetDate.setMonth(7); // 7 = אוגוסט
+        targetDate.setDate(5);
         targetDate.setHours(11, 44, 0, 0); 
 
         let years = now.getFullYear() - targetDate.getFullYear();
@@ -43,8 +42,10 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         if (minutes < 0) { hours--; minutes += 60; }
         if (hours < 0) { hours += 24; }
         
-        // מענה המפנה לקבצים המקומיים 1 ו-2 בשלוחה ולהודעות המערכת המובנות
-        const responseText = `id_list_message=n-${years}.1.n-${months}.m-3968.n-${days}.2.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-1196`;
+        // 1 = הקובץ המקומי בשלוחה עבור "שנים" (1.wav)
+        // 2 = הקובץ המקומי בשלוחה עבור "ימים" (2.wav)
+        // t-months, t-hours, t-minutes, t-seconds = הודעות מערכת מובנות
+        const responseText = `id_list_message=n-${years}.1.n-${months}.t-months.n-${days}.2.n-${hours}.t-hours.n-${minutes}.t-minutes.n-${seconds}.t-seconds`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
