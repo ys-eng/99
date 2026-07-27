@@ -39,8 +39,13 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         if (minutes < 0) { hours--; minutes += 60; }
         if (hours < 0) { hours += 24; }
 
-        // פנייה לקבצי השמע בשלוחה (1.wav עד 6.wav)
-        const responseText = `id_list_message=n-${years}.1.n-${months}.2.n-${days}.3.n-${hours}.4.n-${minutes}.5.n-${seconds}.6`;
+        // הרכבת המענה:
+        // 1.wav - שנים (הקלטה מקומית בשלוחה)
+        // t-3968 - חודשים (M3968)
+        // t-1185 - שעות (M1185)
+        // t-1183 - דקות (M1183)
+        // t-1196 - שניות (M1196)
+        const responseText = `id_list_message=n-${years}.1.n-${months}.t-3968.n-${days}.t-days.n-${hours}.t-1185.n-${minutes}.t-1183.n-${seconds}.t-1196`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
