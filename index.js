@@ -10,33 +10,33 @@ app.get('/', (req, res) => {
 
 app.get('/time-elapsed-hebrew', (req, res) => {
     try {
-        // תאריך נוכחי עברי
-        const now = new Date();
+        // קבלת הזמן הנוכחי לפי שעון ישראל
+        const nowString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
+        const now = new Date(nowString);
         const hNow = new HDate(now);
 
-        // תאריך יעד עברי (לדוגמה: ט' באב ג'תת''ל - שנת 70 לספירה)
-        // פרמטרים: יום, חודש (Av), שנה עברית (3830)
+        // תאריך יעד: 9 באב (5 באוגוסט שנת 70 לספירה)
         const hTarget = new HDate(9, 'Av', 3830);
 
-        // חישוב שנים עבריות
+        // חישוב שנים וחודשים עבריים
         let years = hNow.getFullYear() - hTarget.getFullYear();
         let months = hNow.getMonth() - hTarget.getMonth();
 
         if (months < 0) {
             years--;
-            // בדיקת מספר החודשים בשנה העברית הקודמת (12 או 13)
             const prevYear = hNow.getFullYear() - 1;
             const monthsInPrevYear = new HDate(1, 'Tishrei', prevYear).isLeap() ? 13 : 12;
             months += monthsInPrevYear;
         }
 
+        // חישוב ימים דינמי
         let days = hNow.getDate() - hTarget.getDate();
         if (days < 0) {
             months--;
-            days += 30; // המרה מוערכת לימים בחודש עברי
+            days += 30;
         }
 
-        // חישוב שעות, דקות ושניות לפי השעון המקומי
+        // חישוב שעות, דקות ושניות (לפי שעון ישראל)
         const targetHours = 11;
         const targetMinutes = 44;
 
@@ -48,7 +48,7 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         if (minutes < 0) { hours--; minutes += 60; }
         if (hours < 0) { hours += 24; }
 
-        // הפניה לקבצים/הודעות במערכת
+        // מחרוזת מענה לימות המשיח
         const responseText = `id_list_message=n-${years}.f-1.n-${months}.m-3968.n-${days}.f-2.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
