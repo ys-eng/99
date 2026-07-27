@@ -10,17 +10,14 @@ app.get('/', (req, res) => {
 
 app.get('/time-elapsed-hebrew', (req, res) => {
     try {
-        const now = new Date(); // זמן נוכחי ב-UTC
+        const now = new Date();
         
-        // המרה לזמן מקומי בישראל לחישוב הימים והתאריך העברי
         const nowIsraelString = now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
         const nowIsrael = new Date(nowIsraelString);
         const hNow = new HDate(nowIsrael);
 
-        // תאריך יעד עברי (9 באב ג'תת''ל)
         const hTarget = new HDate(9, 'Av', 3830);
 
-        // חישוב שנים וחודשים עבריים
         let years = hNow.getFullYear() - hTarget.getFullYear();
         let months = hNow.getMonth() - hTarget.getMonth();
 
@@ -31,14 +28,12 @@ app.get('/time-elapsed-hebrew', (req, res) => {
             months += monthsInPrevYear;
         }
 
-        // חישוב ימים
         let days = hNow.getDate() - hTarget.getDate();
         if (days < 0) {
             months--;
             days += 30;
         }
 
-        // 11:44 לפי שעון חורף (UTC+2) שקול ל-09:44 ב-UTC
         const targetHoursUTC = 9;
         const targetMinutesUTC = 44;
 
@@ -50,8 +45,13 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         if (minutes < 0) { hours--; minutes += 60; }
         if (hours < 0) { hours += 24; }
 
-        // מחרוזת מענה לימות המשיח
-        const responseText = `id_list_message=n-${years}.f-1.n-${months}.m-3968.n-${days}.f-2.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
+        // f-1 = שנים
+        // m-3968 = חודשים
+        // m-2593 = ימים
+        // m-1185 = שעות
+        // m-1183 = דקות
+        // m-2787 = שניות
+        const responseText = `id_list_message=n-${years}.f-1.n-${months}.m-3968.n-${days}.m-2593.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
