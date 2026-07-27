@@ -3,18 +3,22 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// נתיב ראשי לבדיקת תקינות עבור UptimeRobot
 app.get('/', (req, res) => {
     res.status(200).send('OK');
 });
 
-// הנתיב המיועד לימות המשיח
 app.get('/time-elapsed-hebrew', (req, res) => {
     try {
-        const now = new Date();
+        // קבלת הזמן הנוכחי לפי שעון ישראל
+        const nowString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
+        const now = new Date(nowString);
         
-        // הגדרת תאריך היעד (שנה, חודש 0-11, יום, שעה, דקה, שנייה)
-        const targetDate = new Date(70, 7, 30, 11, 44, 0); 
+        // הגדרת תאריך היעד: 5 באוגוסט שנת 70, בשעה 11:44:00 לפי שעון ישראל
+        const targetDate = new Date();
+        targetDate.setFullYear(70);
+        targetDate.setMonth(7); // אוגוסט (0 = ינואר, 7 = אוגוסט)
+        targetDate.setDate(5);  // ה-5 בחודש
+        targetDate.setHours(11, 44, 0, 0); 
 
         let years = now.getFullYear() - targetDate.getFullYear();
         let months = now.getMonth() - targetDate.getMonth();
@@ -38,15 +42,8 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         if (seconds < 0) { minutes--; seconds += 60; }
         if (minutes < 0) { hours--; minutes += 60; }
         if (hours < 0) { hours += 24; }
-
-        // מקרא תגים מתוקן:
-        // 1 - קובץ השמעה מקומי בשלוחה (שנים)
-        // m-3968 - הודעת מערכת לחודשים (M3968)
-        // 2 - אם יש לך קובץ לימים, או m- עבור הודעת מערכת של ימים
-        // m-1185 - הודעת מערכת לשעות (M1185)
-        // m-1183 - הודעת מערכת לדקות (M1183)
-        // m-1196 - הודעת מערכת לשניות (M1196)
         
+        // מענה המפנה לקבצים המקומיים 1 ו-2 בשלוחה ולהודעות המערכת המובנות
         const responseText = `id_list_message=n-${years}.1.n-${months}.m-3968.n-${days}.2.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-1196`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
