@@ -12,10 +12,10 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         const nowString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
         const now = new Date(nowString);
         
-        // הגדרת תאריך היעד: 5 באוגוסט שנת 70, שעה 11:44 לפי שעון ישראל
+        // 5 באוגוסט שנת 70, 11:44 בבוקר
         const targetDate = new Date();
         targetDate.setFullYear(70);
-        targetDate.setMonth(7); // 7 = אוגוסט
+        targetDate.setMonth(7); 
         targetDate.setDate(5);
         targetDate.setHours(11, 44, 0, 0); 
 
@@ -42,8 +42,13 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         if (minutes < 0) { hours--; minutes += 60; }
         if (hours < 0) { hours += 24; }
         
-        // שימוש בתג t- עבור כל המילים בעברית מבטיח הקראה רציפה וללא שגיאות
-        const responseText = `id_list_message=n-${years}.t-שנים.n-${months}.t-חודשים.n-${days}.t-ימים.n-${hours}.t-שעות.n-${minutes}.t-דקות.n-${seconds}.t-שניות`;
+        // 1.wav = שנים (הקלטה מקומית)
+        // m-3968 = חודשים (הודעת מערכת)
+        // 2.wav = ימים (הקלטה מקומית)
+        // m-1185 = שעות (הודעת מערכת)
+        // m-1183 = דקות (הודעת מערכת)
+        // m-1196 = שניות (הודעת מערכת)
+        const responseText = `id_list_message=n-${years}.1.n-${months}.m-3968.n-${days}.2.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-1196`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
