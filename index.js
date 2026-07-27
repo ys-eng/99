@@ -13,7 +13,7 @@ app.get('/time-elapsed-hebrew', (req, res) => {
     try {
         const now = new Date();
         
-        // הגדרת תאריך היעד (שנה, חודש 0-11, יום)
+        // הגדרת תאריך היעד (שנה, חודש 0-11, יום, שעה, דקה, שנייה)
         const targetDate = new Date(70, 7, 30, 11, 44, 0); 
 
         let years = now.getFullYear() - targetDate.getFullYear();
@@ -39,8 +39,8 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         if (minutes < 0) { hours--; minutes += 60; }
         if (hours < 0) { hours += 24; }
 
-        // שימוש בתגי הודעות מערכת מובנות של ימות המשיח (t-...)
-        const responseText = `id_list_message=n-${years}.t-years.n-${months}.t-months.n-${days}.t-days.n-${hours}.t-hours.n-${minutes}.t-minutes.n-${seconds}.t-seconds`;
+        // פנייה לקבצי השמע בשלוחה (1.wav עד 6.wav)
+        const responseText = `id_list_message=n-${years}.1.n-${months}.2.n-${days}.3.n-${hours}.4.n-${minutes}.5.n-${seconds}.6`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
