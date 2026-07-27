@@ -10,12 +10,14 @@ app.get('/', (req, res) => {
 
 app.get('/time-elapsed-hebrew', (req, res) => {
     try {
-        // קבלת הזמן הנוכחי לפי שעון ישראל
-        const nowString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
-        const now = new Date(nowString);
-        const hNow = new HDate(now);
+        const now = new Date(); // זמן נוכחי ב-UTC
+        
+        // המרה לזמן מקומי בישראל לחישוב הימים והתאריך העברי
+        const nowIsraelString = now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
+        const nowIsrael = new Date(nowIsraelString);
+        const hNow = new HDate(nowIsrael);
 
-        // תאריך יעד: 9 באב (5 באוגוסט שנת 70 לספירה)
+        // תאריך יעד עברי (9 באב ג'תת''ל)
         const hTarget = new HDate(9, 'Av', 3830);
 
         // חישוב שנים וחודשים עבריים
@@ -29,20 +31,20 @@ app.get('/time-elapsed-hebrew', (req, res) => {
             months += monthsInPrevYear;
         }
 
-        // חישוב ימים דינמי
+        // חישוב ימים
         let days = hNow.getDate() - hTarget.getDate();
         if (days < 0) {
             months--;
             days += 30;
         }
 
-        // חישוב שעות, דקות ושניות (לפי שעון ישראל)
-        const targetHours = 11;
-        const targetMinutes = 44;
+        // 11:44 לפי שעון חורף (UTC+2) שקול ל-09:44 ב-UTC
+        const targetHoursUTC = 9;
+        const targetMinutesUTC = 44;
 
-        let hours = now.getHours() - targetHours;
-        let minutes = now.getMinutes() - targetMinutes;
-        let seconds = now.getSeconds();
+        let hours = now.getUTCHours() - targetHoursUTC;
+        let minutes = now.getUTCMinutes() - targetMinutesUTC;
+        let seconds = now.getUTCSeconds();
 
         if (seconds < 0) { minutes--; seconds += 60; }
         if (minutes < 0) { hours--; minutes += 60; }
