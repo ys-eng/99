@@ -42,13 +42,13 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         if (minutes < 0) { hours--; minutes += 60; }
         if (hours < 0) { hours += 24; }
         
-        // 1.wav = קובץ מקומי בשלוחה (שנים)
+        // f-1 = קובץ מקומי 1.wav (שנים)
         // m-3968 = חודשים
-        // 2.wav = קובץ מקומי בשלוחה (ימים)
+        // f-2 = קובץ מקומי 2.wav (ימים)
         // m-1185 = שעות
         // m-1183 = דקות
         // m-2787 = שניות
-        const responseText = `id_list_message=n-${years}.1.wav.n-${months}.m-3968.n-${days}.2.wav.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
+        const responseText = `id_list_message=n-${years}.f-1.n-${months}.m-3968.n-${days}.f-2.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
