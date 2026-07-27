@@ -39,13 +39,15 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         if (minutes < 0) { hours--; minutes += 60; }
         if (hours < 0) { hours += 24; }
 
-        // הרכבת המענה:
-        // 1.wav - שנים (הקלטה מקומית בשלוחה)
-        // t-3968 - חודשים (M3968)
-        // t-1185 - שעות (M1185)
-        // t-1183 - דקות (M1183)
-        // t-1196 - שניות (M1196)
-        const responseText = `id_list_message=n-${years}.1.n-${months}.t-3968.n-${days}.t-days.n-${hours}.t-1185.n-${minutes}.t-1183.n-${seconds}.t-1196`;
+        // מקרא תגים מתוקן:
+        // 1 - קובץ השמעה מקומי בשלוחה (שנים)
+        // m-3968 - הודעת מערכת לחודשים (M3968)
+        // 2 - אם יש לך קובץ לימים, או m- עבור הודעת מערכת של ימים
+        // m-1185 - הודעת מערכת לשעות (M1185)
+        // m-1183 - הודעת מערכת לדקות (M1183)
+        // m-1196 - הודעת מערכת לשניות (M1196)
+        
+        const responseText = `id_list_message=n-${years}.1.n-${months}.m-3968.n-${days}.2.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-1196`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
