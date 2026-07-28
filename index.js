@@ -12,14 +12,62 @@ app.get('/time-elapsed-hebrew', (req, res) => {
     try {
         const now = new Date();
         
+        // המרה לזמן ישראל לצורך חישוב התאריך העברי
         const nowIsraelString = now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
         const nowIsrael = new Date(nowIsraelString);
-        const hNow = new HDate(nowIsrael);
 
-        const hTarget = new HDate(9, 'Av', 3830);
+        // תאריך יעד: 17 ביולי 69 לספירה
+        // 11:42 בשעון חורף (UTC+2) שקול ל-09:42 UTC
+        const targetYear = 69;
+        const targetMonth = 6; // יולי (0 = ינואר)
+        const targetDate = 17;
+        const targetHoursUTC = 9;
+        const targetMinutesUTC = 42;
+        const targetSecondsUTC = 0;
+
+        // חישוב הפרש השעות, הדקות והשניות מול UTC
+        let hours = now.getUTCHours() - targetHoursUTC;
+        let minutes = now.getUTCMinutes() - targetMinutesUTC;
+        let seconds = now.getUTCSeconds() - targetSecondsUTC;
+
+        let dayOffset = 0; // האם לעדכן יום אחורה אם עדיין לא הגיע שעת היעד היום
+
+        if (seconds < 0) {
+            seconds += 60;
+            minutes--;
+        }
+        if (minutes < 0) {
+            minutes += 60;
+            hours--;
+        }
+        if (hours < 0) {
+            hours += 24;
+            dayOffset = -1; // עדיין לא עברו 24 שעות מלאות ביחס לשעת היעד
+        }
+
+        // חישוב התאריך העברי של היום (בהתחשב בשעה ביחס לשעת היעד)
+        const effectiveDateIsrael = new Date(nowIsrael);
+        if (dayOffset === -1) {
+            effectiveDateIsrael.setDate(effectiveDateIsrael.getDate() - 1);
+        }
+
+        const hNow = new HDate(effectiveDateIsrael);
+
+        // תאריך היעד העברי עבור 17 ביולי 69
+        const targetGregorian = new Date(Date.UTC(targetYear, targetMonth, targetDate));
+        const hTarget = new HDate(targetGregorian);
 
         let years = hNow.getFullYear() - hTarget.getFullYear();
         let months = hNow.getMonth() - hTarget.getMonth();
+        let days = hNow.getDate() - hTarget.getDate();
+
+        if (days < 0) {
+            months--;
+            const prevMonthDate = new Date(effectiveDateIsrael);
+            prevMonthDate.setDate(prevMonthDate.getDate() - hNow.getDate());
+            const hPrevMonth = new HDate(prevMonthDate);
+            days += hPrevMonth.getDaysInMonth();
+        }
 
         if (months < 0) {
             years--;
@@ -27,23 +75,6 @@ app.get('/time-elapsed-hebrew', (req, res) => {
             const monthsInPrevYear = new HDate(1, 'Tishrei', prevYear).isLeap() ? 13 : 12;
             months += monthsInPrevYear;
         }
-
-        let days = hNow.getDate() - hTarget.getDate();
-        if (days < 0) {
-            months--;
-            days += 30;
-        }
-
-        const targetHoursUTC = 9;
-        const targetMinutesUTC = 44;
-
-        let hours = now.getUTCHours() - targetHoursUTC;
-        let minutes = now.getUTCMinutes() - targetMinutesUTC;
-        let seconds = now.getUTCSeconds();
-
-        if (seconds < 0) { minutes--; seconds += 60; }
-        if (minutes < 0) { hours--; minutes += 60; }
-        if (hours < 0) { hours += 24; }
 
         // f-1 = שנים
         // m-3968 = חודשים
