@@ -17,7 +17,6 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         const nowIsrael = new Date(nowIsraelString);
 
         // תאריך יעד: 17 ביולי שנת 69 לספירה
-        // שעה 11:42 בשעון חורף (UTC+2) מקבילה ל-09:42 ב-UTC
         const targetYear = 69;
         const targetMonth = 6; // יולי (0 = ינואר)
         const targetDate = 17;
@@ -53,8 +52,10 @@ app.get('/time-elapsed-hebrew', (req, res) => {
 
         const hNow = new HDate(effectiveDateIsrael);
 
-        // יצירת תאריך היעד לשנת 69
-        const targetGregorian = new Date(Date.UTC(targetYear, targetMonth, targetDate));
+        // יצירת תאריך היעד לשנת 69 לספירה באופן מפורש
+        const targetGregorian = new Date(Date.UTC(2000, targetMonth, targetDate));
+        targetGregorian.setUTCFullYear(targetYear); // מקבע מפורשות את שנת 69 ולא 1969
+        
         const hTarget = new HDate(targetGregorian);
 
         let years = hNow.getFullYear() - hTarget.getFullYear();
