@@ -12,12 +12,12 @@ app.get('/time-elapsed-hebrew', (req, res) => {
     try {
         const now = new Date();
         
-        // המרה לזמן ישראל לצורך חישוב התאריך העברי
+        // המרה לזמן ישראל
         const nowIsraelString = now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
         const nowIsrael = new Date(nowIsraelString);
 
-        // תאריך יעד: 17 ביולי 69 לספירה
-        // 11:42 בשעון חורף (UTC+2) שקול ל-09:42 UTC
+        // תאריך יעד: 17 ביולי שנת 69 לספירה
+        // שעה 11:42 בשעון חורף (UTC+2) מקבילה ל-09:42 ב-UTC
         const targetYear = 69;
         const targetMonth = 6; // יולי (0 = ינואר)
         const targetDate = 17;
@@ -25,12 +25,12 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         const targetMinutesUTC = 42;
         const targetSecondsUTC = 0;
 
-        // חישוב הפרש השעות, הדקות והשניות מול UTC
+        // חישוב הפרש הזמן ביחס לשעת היעד
         let hours = now.getUTCHours() - targetHoursUTC;
         let minutes = now.getUTCMinutes() - targetMinutesUTC;
         let seconds = now.getUTCSeconds() - targetSecondsUTC;
 
-        let dayOffset = 0; // האם לעדכן יום אחורה אם עדיין לא הגיע שעת היעד היום
+        let dayOffset = 0;
 
         if (seconds < 0) {
             seconds += 60;
@@ -42,10 +42,10 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         }
         if (hours < 0) {
             hours += 24;
-            dayOffset = -1; // עדיין לא עברו 24 שעות מלאות ביחס לשעת היעד
+            dayOffset = -1; // עדיין לא חלפה יממה שלמה משעת היעד
         }
 
-        // חישוב התאריך העברי של היום (בהתחשב בשעה ביחס לשעת היעד)
+        // חישוב התאריך האפקטיבי להשוואה
         const effectiveDateIsrael = new Date(nowIsrael);
         if (dayOffset === -1) {
             effectiveDateIsrael.setDate(effectiveDateIsrael.getDate() - 1);
@@ -53,7 +53,7 @@ app.get('/time-elapsed-hebrew', (req, res) => {
 
         const hNow = new HDate(effectiveDateIsrael);
 
-        // תאריך היעד העברי עבור 17 ביולי 69
+        // יצירת תאריך היעד לשנת 69
         const targetGregorian = new Date(Date.UTC(targetYear, targetMonth, targetDate));
         const hTarget = new HDate(targetGregorian);
 
