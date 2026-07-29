@@ -49,9 +49,8 @@ app.get('/time-elapsed-hebrew', (req, res) => {
 
         const hNow = new HDate(effectiveDateIsrael);
 
-        // הגדרה מפורשת של התאריך העברי עבור 17 ביולי שנת 69 לספירה:
-        // 17 ביולי 69 לספירה מקביל ל-ח' באב ג'תתכ"ט (שנה 3829)
-        const hTarget = new HDate(8, 'Av', 3829);
+        // תאריך יעד מעודכן (י' באב ג'תתכ"ט - מותאם ביומיים קדימה)
+        const hTarget = new HDate(10, 'Av', 3829);
 
         let years = hNow.getFullYear() - hTarget.getFullYear();
         let months = hNow.getMonth() - hTarget.getMonth();
