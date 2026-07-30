@@ -5,7 +5,7 @@ const { HDate } = require('hebcal');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// הגשת קבצים סטטיים מתוך תיקיית audio (למשל audio/1.mp3)
+// הגשת קבצים סטטיים מתוך תיקיית audio
 app.use('/audio', express.static(path.join(__dirname, 'audio')));
 
 app.get('/', (req, res) => {
@@ -15,11 +15,9 @@ app.get('/', (req, res) => {
 app.get('/time-elapsed-hebrew', (req, res) => {
     try {
         const now = new Date();
-        const host = req.get('host');
-        const protocol = req.protocol;
         
-        // הכתובת של קובץ השמע בשרת
-        const audioUrl = `${protocol}://${host}/audio/1.mp3`;
+        // כתובת HTTPS מפורשת ומלאה לקובץ השמע בשרת Render
+        const audioUrl = 'https://nine9-2.onrender.com/audio/1.mp3';
 
         // המרה לשעון ישראל
         const nowIsraelString = now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
@@ -46,7 +44,7 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         }
         if (hours < 0) {
             hours += 24;
-            dayOffset = -1; // עדיין לא חלפה יממה שלמה משעת היעד
+            dayOffset = -1;
         }
 
         const effectiveDateIsrael = new Date(nowIsrael);
@@ -55,8 +53,6 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         }
 
         const hNow = new HDate(effectiveDateIsrael);
-        
-        // תאריך יעד: י' באב ג'תתכ"ט (שנה 3829)
         const hTarget = new HDate(10, 'Av', 3829);
 
         let years = hNow.getFullYear() - hTarget.getFullYear();
@@ -78,12 +74,6 @@ app.get('/time-elapsed-hebrew', (req, res) => {
             months += monthsInPrevYear;
         }
 
-        // t-... = השמעת קובץ השמע 1.mp3 מהשרת עבור המילה "שנים"
-        // m-3968 = חודשים
-        // m-2593 = ימים
-        // m-1185 = שעות
-        // m-1183 = דקות
-        // m-2787 = שניות
         const responseText = `id_list_message=n-${years}.t-${audioUrl}.n-${months}.m-3968.n-${days}.m-2593.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
