@@ -1,8 +1,12 @@
 const express = require('express');
+const path = require('path');
 const { HDate } = require('hebcal');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// מאפשר לשרת להגיש קבצים סטטיים (כמו קובצי שמע) מתוך תיקייה בשם audio
+app.use('/audio', express.static(path.join(__dirname, 'audio')));
 
 app.get('/', (req, res) => {
     res.status(200).send('OK');
@@ -11,17 +15,21 @@ app.get('/', (req, res) => {
 app.get('/time-elapsed-hebrew', (req, res) => {
     try {
         const now = new Date();
+        const host = req.get('host');
+        const protocol = req.protocol;
         
+        // הכתובת של קובץ השמע בשרת שלך
+        const audioUrl = `${protocol}://${host}/audio/1.wav`;
+
         // המרה לזמן ישראל
         const nowIsraelString = now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
         const nowIsrael = new Date(nowIsraelString);
 
-        // הגדרת שעת היעד (11:42 בשעון חורף = 09:42 UTC)
+        // שעת יעד: 11:42 בשעון חורף (UTC+2 = 09:42 UTC)
         const targetHoursUTC = 9;
         const targetMinutesUTC = 42;
         const targetSecondsUTC = 0;
 
-        // חישוב הפרש הזמן ביחס לשעת היעד
         let hours = now.getUTCHours() - targetHoursUTC;
         let minutes = now.getUTCMinutes() - targetMinutesUTC;
         let seconds = now.getUTCSeconds() - targetSecondsUTC;
@@ -38,18 +46,15 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         }
         if (hours < 0) {
             hours += 24;
-            dayOffset = -1; // עדיין לא חלפה יממה שלמה משעת היעד
+            dayOffset = -1;
         }
 
-        // חישוב התאריך האפקטיבי להשוואה
         const effectiveDateIsrael = new Date(nowIsrael);
         if (dayOffset === -1) {
             effectiveDateIsrael.setDate(effectiveDateIsrael.getDate() - 1);
         }
 
         const hNow = new HDate(effectiveDateIsrael);
-
-        // תאריך יעד מעודכן (י' באב ג'תתכ"ט - מותאם ביומיים קדימה)
         const hTarget = new HDate(10, 'Av', 3829);
 
         let years = hNow.getFullYear() - hTarget.getFullYear();
@@ -71,13 +76,8 @@ app.get('/time-elapsed-hebrew', (req, res) => {
             months += monthsInPrevYear;
         }
 
-        // f-1 = שנים
-        // m-3968 = חודשים
-        // m-2593 = ימים
-        // m-1185 = שעות
-        // m-1183 = דקות
-        // m-2787 = שניות
-        const responseText = `id_list_message=n-${years}.f-1.n-${months}.m-3968.n-${days}.m-2593.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
+        // t-http/... = השמעת קובץ שמע מכתובת אינטרנט חיצונית
+        const responseText = `id_list_message=n-${years}.t-${audioUrl}.n-${months}.m-3968.n-${days}.m-2593.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
