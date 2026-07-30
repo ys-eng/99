@@ -1,12 +1,8 @@
 const express = require('express');
-const path = require('path');
 const { HDate } = require('hebcal');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// הגשת קבצים סטטיים מתוך תיקיית audio
-app.use('/audio', express.static(path.join(__dirname, 'audio')));
 
 app.get('/', (req, res) => {
     res.status(200).send('OK');
@@ -16,9 +12,6 @@ app.get('/time-elapsed-hebrew', (req, res) => {
     try {
         const now = new Date();
         
-        // כתובת השמע בשרת - עם קידומת s- המיועדת להשמעת קובץ קול מ-URL
-        const audioUrl = 's-https://nine9-2.onrender.com/audio/1.mp3';
-
         // המרה לשעון ישראל
         const nowIsraelString = now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
         const nowIsrael = new Date(nowIsraelString);
@@ -44,7 +37,7 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         }
         if (hours < 0) {
             hours += 24;
-            dayOffset = -1;
+            dayOffset = -1; // עדיין לא חלפה יממה שלמה משעת היעד
         }
 
         const effectiveDateIsrael = new Date(nowIsrael);
@@ -53,6 +46,8 @@ app.get('/time-elapsed-hebrew', (req, res) => {
         }
 
         const hNow = new HDate(effectiveDateIsrael);
+        
+        // תאריך יעד: י' באב ג'תתכ"ט (שנה 3829)
         const hTarget = new HDate(10, 'Av', 3829);
 
         let years = hNow.getFullYear() - hTarget.getFullYear();
@@ -74,8 +69,13 @@ app.get('/time-elapsed-hebrew', (req, res) => {
             months += monthsInPrevYear;
         }
 
-        // s- https://... = השמעת קובץ שמע מרשת חיצונית
-        const responseText = `id_list_message=n-${years}.${audioUrl}.n-${months}.m-3968.n-${days}.m-2593.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
+        // f-1 = השמעת הקובץ 1.wav שנמצא בשלוחה במערכת ימות המשיח עבור "שנים"
+        // m-3968 = חודשים
+        // m-2593 = ימים
+        // m-1185 = שעות
+        // m-1183 = דקות
+        // m-2787 = שניות
+        const responseText = `id_list_message=n-${years}.f-1.n-${months}.m-3968.n-${days}.m-2593.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
