@@ -16,8 +16,8 @@ app.get('/time-elapsed-hebrew', (req, res) => {
     try {
         const now = new Date();
         
-        // כתובת HTTPS מפורשת ומלאה לקובץ השמע בשרת Render
-        const audioUrl = 'https://nine9-2.onrender.com/audio/1.mp3';
+        // כתובת השמע בשרת - עם קידומת s- המיועדת להשמעת קובץ קול מ-URL
+        const audioUrl = 's-https://nine9-2.onrender.com/audio/1.mp3';
 
         // המרה לשעון ישראל
         const nowIsraelString = now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
@@ -74,7 +74,8 @@ app.get('/time-elapsed-hebrew', (req, res) => {
             months += monthsInPrevYear;
         }
 
-        const responseText = `id_list_message=n-${years}.t-${audioUrl}.n-${months}.m-3968.n-${days}.m-2593.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
+        // s- https://... = השמעת קובץ שמע מרשת חיצונית
+        const responseText = `id_list_message=n-${years}.${audioUrl}.n-${months}.m-3968.n-${days}.m-2593.n-${hours}.m-1185.n-${minutes}.m-1183.n-${seconds}.m-2787`;
 
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(responseText);
