@@ -12,15 +12,16 @@ app.get('/time-elapsed-hebrew', (req, res) => {
     try {
         const now = new Date();
         
-        // המרה לשעון ישראל
+        // המרה לזמן ישראל
         const nowIsraelString = now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
         const nowIsrael = new Date(nowIsraelString);
 
-        // שעת יעד: 11:42 בשעון חורף (UTC+2 = 09:42 UTC)
+        // הגדרת שעת היעד (11:42 בשעון חורף = 09:42 UTC)
         const targetHoursUTC = 9;
         const targetMinutesUTC = 42;
         const targetSecondsUTC = 0;
 
+        // חישוב הפרש הזמן ביחס לשעת היעד
         let hours = now.getUTCHours() - targetHoursUTC;
         let minutes = now.getUTCMinutes() - targetMinutesUTC;
         let seconds = now.getUTCSeconds() - targetSecondsUTC;
@@ -40,14 +41,15 @@ app.get('/time-elapsed-hebrew', (req, res) => {
             dayOffset = -1; // עדיין לא חלפה יממה שלמה משעת היעד
         }
 
+        // חישוב התאריך האפקטיבי להשוואה
         const effectiveDateIsrael = new Date(nowIsrael);
         if (dayOffset === -1) {
             effectiveDateIsrael.setDate(effectiveDateIsrael.getDate() - 1);
         }
 
         const hNow = new HDate(effectiveDateIsrael);
-        
-        // תאריך יעד: י' באב ג'תתכ"ט (שנה 3829)
+
+        // תאריך יעד מעודכן (י' באב ג'תתכ"ט - מותאם ביומיים קדימה)
         const hTarget = new HDate(10, 'Av', 3829);
 
         let years = hNow.getFullYear() - hTarget.getFullYear();
@@ -69,7 +71,7 @@ app.get('/time-elapsed-hebrew', (req, res) => {
             months += monthsInPrevYear;
         }
 
-        // f-1 = השמעת הקובץ 1.wav שנמצא בשלוחה במערכת ימות המשיח עבור "שנים"
+        // f-1 = שנים
         // m-3968 = חודשים
         // m-2593 = ימים
         // m-1185 = שעות
